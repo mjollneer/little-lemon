@@ -53,7 +53,7 @@ fun Onboarding(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        Header()
+        Header(true)
         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = "Personal information",
@@ -142,7 +142,7 @@ private fun regicterClick(
 }
 
 @Composable
-fun Header() {
+fun Header(showText: Boolean) {
     Column(Modifier.fillMaxWidth()) {
         Image(
             painter = painterResource(id = R.drawable.logo),
@@ -152,7 +152,7 @@ fun Header() {
                 .padding(16.dp)
                 .height(90.dp)
         )
-        Text(
+        if (showText) Text(
             text = "Lets get to know you",
             modifier = Modifier
                 .fillMaxWidth()
