@@ -7,7 +7,9 @@ import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -38,6 +40,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.nulana.littlelemon.Consts
 import com.nulana.littlelemon.Home
+import com.nulana.littlelemon.Profile
 import com.nulana.littlelemon.R
 import com.nulana.littlelemon.ui.theme.LittleLemonTheme
 
@@ -53,7 +56,7 @@ fun Onboarding(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        Header(true)
+        Header(true, false)
         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = "Personal information",
@@ -142,27 +145,38 @@ private fun regicterClick(
 }
 
 @Composable
-fun Header(showText: Boolean) {
-    Column(Modifier.fillMaxWidth()) {
-        Image(
-            painter = painterResource(id = R.drawable.logo),
-            contentDescription = "",
+fun Header(showText: Boolean, showAvatar: Boolean, navController: NavController? = null) {
+    Box(
+        modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd
+    ) {
+        Column(Modifier.fillMaxWidth()) {
+            Image(
+                painter = painterResource(id = R.drawable.logo),
+                contentDescription = "",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                    .height(90.dp)
+            )
+            if (showText) Text(
+                text = "Lets get to know you",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color(72, 92, 75))
+                    .padding(16.dp)
+                    .height(90.dp)
+                    .wrapContentHeight(),
+                fontSize = 24.sp,
+                color = Color.White,
+                textAlign = TextAlign.Center
+            )
+        }
+        if (showAvatar) Image(
+            painter = painterResource(id = R.drawable.dg), contentDescription = "",
             modifier = Modifier
-                .fillMaxWidth()
                 .padding(16.dp)
-                .height(90.dp)
-        )
-        if (showText) Text(
-            text = "Lets get to know you",
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color(72, 92, 75))
-                .padding(16.dp)
-                .height(90.dp)
-                .wrapContentHeight(),
-            fontSize = 24.sp,
-            color = Color.White,
-            textAlign = TextAlign.Center
+                .height(48.dp)
+                .clickable { navController?.navigate(Profile.route) },
         )
     }
 }
@@ -173,5 +187,6 @@ fun Header(showText: Boolean) {
 fun OnboardingPreview() {
     LittleLemonTheme {
         Onboarding(rememberNavController())
+//        Header(false, true)
     }
 }
