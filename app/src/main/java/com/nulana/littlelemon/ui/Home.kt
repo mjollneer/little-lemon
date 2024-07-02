@@ -1,5 +1,6 @@
 package com.nulana.littlelemon.ui
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -35,28 +36,40 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.google.gson.Gson
+import com.nulana.littlelemon.DB.MenuDatabase
+import com.nulana.littlelemon.DB.MenuItem
 import com.nulana.littlelemon.R
-import com.nulana.littlelemon.network.MenuGetter
+import com.nulana.littlelemon.network.MenuData
+import com.nulana.littlelemon.network.MenuNetGetter
 import com.nulana.littlelemon.ui.theme.LittleLemonTheme
 import kotlinx.coroutines.launch
 
 @Composable
-fun Home(navController: NavController) {
+fun Home(navController: NavController, database: MenuDatabase?) {
     Column {
         val scope = rememberCoroutineScope()
-        var text by remember { mutableStateOf("Loading") }
+        var text by remember { mutableStateOf("") }
+        var menuOBJ: MenuData? by remember { mutableStateOf(null) }
         LaunchedEffect(true) {
             scope.launch {
                 text = try {
-                    MenuGetter().getAsText()
+                    MenuNetGetter().getAsText()
                 } catch (e: Exception) {
-                    e.localizedMessage ?: "error"
+                    Log.d("OBJ", e.localizedMessage)
+                    ""
                 }
+                if (!text.isNullOrBlank()) {
+                    menuOBJ = Gson().fromJson(text, MenuData::class.java)
+//                    menuOBJ?.menu?.forEach { database?.menuDao()?.saveMenuItem(it.getDBItem()) }
+//                    database?.menuDao()?.saveMenuItem(MenuItem(1, "", "", 1, "", ""))
+                }
+
+                Log.d("OBJ", menuOBJ.toString())
             }
         }
 
         Header(false, true, navController)
-
         restDescription()
         categories()
         menuList()
@@ -219,6 +232,6 @@ fun menuItem() {
 @Composable
 fun HomePreview() {
     LittleLemonTheme {
-        Home(rememberNavController())
+        Home(rememberNavController(), null)
     }
 }

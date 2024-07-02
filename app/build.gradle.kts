@@ -3,8 +3,9 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinAndroid)
 
 //    id("plugin.serialization")
-    kotlin("plugin.serialization") version "1.9.0" apply false
+//    kotlin("plugin.serialization") version "1.9.0" apply false
     id("com.google.devtools.ksp")
+//    id("com.google.devtools.ksp") version "2.0.0-1.0.21"
 //    id("kotlin-kapt")
 //    id("org.jetbrains.kotlin.plugin.serialization")
 }
@@ -56,6 +57,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.runtime.livedata)
     val ktor_version = "2.3.12"
 
     implementation(libs.androidx.core.ktx)
@@ -75,12 +77,13 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
     implementation("io.ktor:ktor-client-content-negotiation:2.1.1")
     implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
+    implementation("com.google.code.gson:gson:2.11.0")
 
-    val room_version = "2.6.1"
-//    implementation("androidx.room:room-runtime:2.4.3")
-//    implementation("androidx.room:room-compiler:2.4.3")
+    val room_version = "2.4.3"
     implementation("androidx.room:room-runtime:$room_version")
     annotationProcessor("androidx.room:room-compiler:$room_version")
+//    ksp("androidx.room:room-compiler:$room_version")
+//    kapt("androidx.room:room-compiler:$room_version")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
