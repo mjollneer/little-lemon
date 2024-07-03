@@ -13,7 +13,7 @@ import com.coursera.ll2.ui.Onboarding
 import com.coursera.ll2.ui.Profile
 
 @Composable
-fun Navigation(navController: NavHostController, database: MenuDatabase?) {
+fun Navigation(navController: NavHostController, database: MenuDatabase) {
     val context = LocalContext.current
     val sharedPreferences: SharedPreferences =
         context.getSharedPreferences(Consts.shared_creds.name, Context.MODE_PRIVATE)

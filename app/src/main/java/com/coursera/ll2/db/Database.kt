@@ -6,6 +6,7 @@ import androidx.room.Database
 import androidx.room.Delete
 import androidx.room.Entity
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.RoomDatabase
@@ -25,11 +26,11 @@ interface MenuDao {
     @Query("SELECT * FROM MenuItem")
     fun getAllMenuItems(): LiveData<List<MenuItem>>
 
-    @Query("SELECT count(*) FROM MenuItem WHERE id = :id")
+    @Query("SELECT count(*) FROM MenuItem WHERE id=:id")
     fun countID(id: Int): LiveData<Int>
 
 
-    @Insert
+    @Insert(entity = MenuItem::class, onConflict = OnConflictStrategy.REPLACE)
     fun saveMenuItem(menuItem: MenuItem)
 
 

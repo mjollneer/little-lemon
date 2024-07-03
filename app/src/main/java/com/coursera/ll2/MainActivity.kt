@@ -19,7 +19,7 @@ import com.coursera.ll2.ui.theme.Ll2Theme
 class MainActivity : ComponentActivity() {
     private val database by lazy {
         Room.databaseBuilder(
-            applicationContext, MenuDatabase::class.java, "menu.db"
+            applicationContext, MenuDatabase::class.java, "menu2.db"
         ).allowMainThreadQueries().build()
     }
 
@@ -32,8 +32,6 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
-                    val menuItems = database.menuDao().getAllMenuItems().value
-//                        .observeAsState(emptyList())
                     Navigation(navController, database)
                 }
             }

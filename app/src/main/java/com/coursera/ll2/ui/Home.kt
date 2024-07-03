@@ -9,17 +9,22 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -35,19 +40,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import com.coursera.ll2.R
 import com.coursera.ll2.db.MenuDatabase
+import com.coursera.ll2.db.MenuItem
 import com.coursera.ll2.network.MenuData
 import com.coursera.ll2.network.MenuNetGetter
 import com.coursera.ll2.ui.theme.Ll2Theme
 import kotlinx.coroutines.launch
 
 @Composable
-fun Home(navController: NavController, database: MenuDatabase?) {
+fun Home(navController: NavController, database: MenuDatabase) {
     Column {
         val scope = rememberCoroutineScope()
-//        var text by remember { mutableStateOf("") }
         var menuOBJ: MenuData? by remember { mutableStateOf(null) }
         LaunchedEffect(true) {
             scope.launch {
@@ -57,37 +63,29 @@ fun Home(navController: NavController, database: MenuDatabase?) {
                     Log.d("OBJ", e.localizedMessage)
                     null
                 }
-//                text = try {
-//                    MenuNetGetter().getAsText()
-//                } catch (e: Exception) {
-//                    Log.d("OBJ", e.localizedMessage)
-//                    ""
-//                }
-//                Log.d("TXT", text)
                 if (menuOBJ != null) {
                     Log.d("OBJ", menuOBJ.toString())
-                    if (database != null)
-                        (menuOBJ as MenuData).menu.forEach {
-                            val count = database.menuDao().countID(it.id).value
-                            Log.d("countID", "id " + it.id + " is " + count)
-                            if (count == 0 || count == null) {
-                                database.menuDao().saveMenuItem(it.getDBItem())
-                            }
+                    if (database != null) (menuOBJ as MenuData).menu.forEach {
+                        val count = database.menuDao().countID(it.id).value
+                        Log.d("countID", "id " + it.id + " is " + count)
+                        if (count == 0 || count == null) {
+                            database.menuDao().saveMenuItem(it.getDBItem())
                         }
+                    }
                 }
             }
         }
-
+        val menuItems by database.menuDao().getAllMenuItems().observeAsState(emptyList())
+        Log.d("getAllMenuItems", menuItems.size.toString())
         Header(false, true, navController)
-        restDescription()
-        categories()
-        menuList()
-//        Text(text = text)
+        RestDescription()
+        Categories(menuItems)
+        MenuList(menuItems)
     }
 }
 
 @Composable
-fun restDescription() {
+fun RestDescription() {
     Column(
         Modifier
             .fillMaxWidth()
@@ -145,7 +143,7 @@ fun restDescription() {
 }
 
 @Composable
-fun categories() {
+fun Categories(menuItems: List<MenuItem>) {
     Column(Modifier.fillMaxWidth()) {
         Text(
             text = "ORDER FOR DELIVERY!",
@@ -155,9 +153,15 @@ fun categories() {
             fontWeight = FontWeight.Bold
         )
         Row(Modifier.fillMaxWidth()) {
-            category(name = "name 1")
-            category(name = "name 2")
-            category(name = "name 3")
+            val categories = menuItems.map { it.category }.toSet().toList()
+            if (menuItems.isNotEmpty()) {
+                LazyRow {
+                    items(categories) { category ->
+                        category(category)
+                    }
+
+                }
+            } else category(name = "Loading...")
         }
     }
 
@@ -183,21 +187,25 @@ fun category(name: String) {
 }
 
 @Composable
-fun menuList() {
-    Column(Modifier.fillMaxWidth()) {
-        menuItem()
-        menuItem()
-        menuItem()
+fun MenuList(menuItems: List<MenuItem>) {
+    LazyColumn(Modifier.fillMaxWidth()) {
+        items(menuItems) { item ->
+            Divider(color = Color.LightGray)
+            menuItem(item)
+        }
     }
 }
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun menuItem() {
+fun menuItem(item: MenuItem) {
     Column(
-        Modifier.fillMaxWidth()
+        Modifier
+            .fillMaxWidth()
+            .padding(0.dp, 8.dp)
     ) {
         Text(
-            text = "Name",
+            text = item.title,
             modifier = Modifier.padding(16.dp, 0.dp),
             fontSize = 16.sp,
             color = Color.Black,
@@ -208,20 +216,21 @@ fun menuItem() {
                 Modifier.fillMaxWidth(0.7f)
             ) {
                 Text(
-                    text = "Description",
+                    text = item.description,
                     modifier = Modifier.padding(16.dp, 0.dp),
                     fontSize = 14.sp,
-                    color = Color.LightGray,
+                    color = Color.Gray,
                 )
                 Text(
-                    text = "Price",
+                    text = "$" + item.price,
                     modifier = Modifier.padding(16.dp, 0.dp),
                     fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
                     color = Color.Gray,
                 )
             }
-            Image(
-                painter = painterResource(id = R.drawable.hrana),
+            GlideImage(
+                model = item.image,
                 contentDescription = "",
                 modifier = Modifier
                     .width(80.dp)
@@ -241,6 +250,6 @@ fun menuItem() {
 @Composable
 fun HomePreview() {
     Ll2Theme {
-        Home(rememberNavController(), null)
+//        Home(rememberNavController(), database)
     }
 }
