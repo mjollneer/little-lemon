@@ -1,42 +1,40 @@
-package com.nulana.littlelemon
+package com.coursera.ll2
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
-import com.nulana.littlelemon.DB.MenuDatabase
-import com.nulana.littlelemon.ui.theme.LittleLemonTheme
+import com.coursera.ll2.db.MenuDatabase
+import com.coursera.ll2.ui.theme.Ll2Theme
 
 class MainActivity : ComponentActivity() {
     private val database by lazy {
         Room.databaseBuilder(
             applicationContext, MenuDatabase::class.java, "menu.db"
-        ).build()
+        ).allowMainThreadQueries().build()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContent {
-            LittleLemonTheme {
+            Ll2Theme {
                 val navController = rememberNavController()
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
-//                    val menuItems by database.menuDao().getAllMenuItems()
+                    val menuItems = database.menuDao().getAllMenuItems().value
 //                        .observeAsState(emptyList())
-//                    Navigation(navController, database)
-                    Navigation(navController, null)
+                    Navigation(navController, database)
                 }
             }
         }
@@ -53,7 +51,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-    LittleLemonTheme {
+    Ll2Theme {
         Greeting("Android")
     }
 }

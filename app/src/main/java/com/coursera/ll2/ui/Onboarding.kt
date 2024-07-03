@@ -1,4 +1,4 @@
-package com.nulana.littlelemon.ui
+package com.coursera.ll2.ui
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -38,11 +38,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.nulana.littlelemon.Consts
-import com.nulana.littlelemon.Home
-import com.nulana.littlelemon.Profile
-import com.nulana.littlelemon.R
-import com.nulana.littlelemon.ui.theme.LittleLemonTheme
+import com.coursera.ll2.Consts
+import com.coursera.ll2.Home
+import com.coursera.ll2.Profile
+import com.coursera.ll2.R
+import com.coursera.ll2.ui.theme.Ll2Theme
 
 @Composable
 fun Onboarding(navController: NavController) {
@@ -185,7 +185,7 @@ fun Header(showText: Boolean, showAvatar: Boolean, navController: NavController?
 @Preview(showBackground = true)
 @Composable
 fun OnboardingPreview() {
-    LittleLemonTheme {
+    Ll2Theme {
         Onboarding(rememberNavController())
 //        Header(false, true)
     }

@@ -1,4 +1,4 @@
-package com.nulana.littlelemon.DB
+package com.coursera.ll2.db
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
@@ -20,11 +20,13 @@ data class MenuItem(
     val category: String
 )
 
-
 @Dao
 interface MenuDao {
     @Query("SELECT * FROM MenuItem")
     fun getAllMenuItems(): LiveData<List<MenuItem>>
+
+    @Query("SELECT count(*) FROM MenuItem WHERE id = :id")
+    fun countID(id: Int): LiveData<Int>
 
 
     @Insert

@@ -1,6 +1,6 @@
-package com.nulana.littlelemon.network
+package com.coursera.ll2.network
 
-import com.nulana.littlelemon.DB.MenuItem
+import com.coursera.ll2.db.MenuItem
 import kotlinx.serialization.Serializable
 
 @Serializable

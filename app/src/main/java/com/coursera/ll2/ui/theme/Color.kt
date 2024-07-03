@@ -1,4 +1,4 @@
-package com.nulana.littlelemon.ui.theme
+package com.coursera.ll2.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

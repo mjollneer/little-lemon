@@ -1,4 +1,4 @@
-package com.nulana.littlelemon.ui
+package com.coursera.ll2.ui
 
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -36,36 +36,45 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.google.gson.Gson
-import com.nulana.littlelemon.DB.MenuDatabase
-import com.nulana.littlelemon.DB.MenuItem
-import com.nulana.littlelemon.R
-import com.nulana.littlelemon.network.MenuData
-import com.nulana.littlelemon.network.MenuNetGetter
-import com.nulana.littlelemon.ui.theme.LittleLemonTheme
+import com.coursera.ll2.R
+import com.coursera.ll2.db.MenuDatabase
+import com.coursera.ll2.network.MenuData
+import com.coursera.ll2.network.MenuNetGetter
+import com.coursera.ll2.ui.theme.Ll2Theme
 import kotlinx.coroutines.launch
 
 @Composable
 fun Home(navController: NavController, database: MenuDatabase?) {
     Column {
         val scope = rememberCoroutineScope()
-        var text by remember { mutableStateOf("") }
+//        var text by remember { mutableStateOf("") }
         var menuOBJ: MenuData? by remember { mutableStateOf(null) }
         LaunchedEffect(true) {
             scope.launch {
-                text = try {
-                    MenuNetGetter().getAsText()
+                menuOBJ = try {
+                    MenuNetGetter().getAsDataObj()
                 } catch (e: Exception) {
                     Log.d("OBJ", e.localizedMessage)
-                    ""
+                    null
                 }
-                if (!text.isNullOrBlank()) {
-                    menuOBJ = Gson().fromJson(text, MenuData::class.java)
-//                    menuOBJ?.menu?.forEach { database?.menuDao()?.saveMenuItem(it.getDBItem()) }
-//                    database?.menuDao()?.saveMenuItem(MenuItem(1, "", "", 1, "", ""))
+//                text = try {
+//                    MenuNetGetter().getAsText()
+//                } catch (e: Exception) {
+//                    Log.d("OBJ", e.localizedMessage)
+//                    ""
+//                }
+//                Log.d("TXT", text)
+                if (menuOBJ != null) {
+                    Log.d("OBJ", menuOBJ.toString())
+                    if (database != null)
+                        (menuOBJ as MenuData).menu.forEach {
+                            val count = database.menuDao().countID(it.id).value
+                            Log.d("countID", "id " + it.id + " is " + count)
+                            if (count == 0 || count == null) {
+                                database.menuDao().saveMenuItem(it.getDBItem())
+                            }
+                        }
                 }
-
-                Log.d("OBJ", menuOBJ.toString())
             }
         }
 
@@ -231,7 +240,7 @@ fun menuItem() {
 @Preview(showBackground = true)
 @Composable
 fun HomePreview() {
-    LittleLemonTheme {
+    Ll2Theme {
         Home(rememberNavController(), null)
     }
 }

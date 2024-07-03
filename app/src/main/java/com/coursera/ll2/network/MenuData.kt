@@ -1,4 +1,4 @@
-package com.nulana.littlelemon.network
+package com.coursera.ll2.network
 
 import kotlinx.serialization.Serializable
 

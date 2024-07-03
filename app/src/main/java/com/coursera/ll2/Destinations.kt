@@ -1,4 +1,4 @@
-package com.nulana.littlelemon
+package com.coursera.ll2
 
 
 interface Destinations {

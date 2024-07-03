@@ -1,4 +1,4 @@
-package com.nulana.littlelemon.ui
+package com.coursera.ll2.ui
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -23,9 +23,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.nulana.littlelemon.Consts
-import com.nulana.littlelemon.Onboarding
-import com.nulana.littlelemon.ui.theme.LittleLemonTheme
+import com.coursera.ll2.Consts
+import com.coursera.ll2.Onboarding
+import com.coursera.ll2.ui.theme.Ll2Theme
 
 @Composable
 fun Profile(navController: NavController) {
@@ -111,7 +111,7 @@ private fun regicterClick(
 @Preview(showBackground = true)
 @Composable
 fun ProfilePreview() {
-    LittleLemonTheme {
+    Ll2Theme {
         Profile(rememberNavController())
     }
 }

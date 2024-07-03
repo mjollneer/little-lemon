@@ -1,4 +1,4 @@
-package com.nulana.littlelemon
+package com.coursera.ll2
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -7,10 +7,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.nulana.littlelemon.DB.MenuDatabase
-import com.nulana.littlelemon.ui.Home
-import com.nulana.littlelemon.ui.Onboarding
-import com.nulana.littlelemon.ui.Profile
+import com.coursera.ll2.db.MenuDatabase
+import com.coursera.ll2.ui.Home
+import com.coursera.ll2.ui.Onboarding
+import com.coursera.ll2.ui.Profile
 
 @Composable
 fun Navigation(navController: NavHostController, database: MenuDatabase?) {
