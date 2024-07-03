@@ -1,6 +1,6 @@
 package com.coursera.ll2.ui
 
-import android.util.Log
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -53,6 +54,21 @@ import kotlinx.coroutines.launch
 @Composable
 fun Home(navController: NavController, database: MenuDatabase) {
     Column {
+        var searchString by remember {
+            mutableStateOf("")
+        }
+        val onSearchStringChanged: (String) -> Unit = { searchString = it }
+
+        var selectedCategories by remember {
+            mutableStateOf(emptySet<String>())
+//            mutableStateOf(setOf("mains"))
+        }
+        val onCategoryClicked: (String) -> Unit = {
+            if (selectedCategories.contains(it))
+                selectedCategories = selectedCategories.minus(it)
+            else selectedCategories = selectedCategories.plus(it)
+        }
+
         val scope = rememberCoroutineScope()
         var menuOBJ: MenuData? by remember { mutableStateOf(null) }
         LaunchedEffect(true) {
@@ -60,32 +76,30 @@ fun Home(navController: NavController, database: MenuDatabase) {
                 menuOBJ = try {
                     MenuNetGetter().getAsDataObj()
                 } catch (e: Exception) {
-                    Log.d("OBJ", e.localizedMessage)
                     null
                 }
                 if (menuOBJ != null) {
-                    Log.d("OBJ", menuOBJ.toString())
                     if (database != null) (menuOBJ as MenuData).menu.forEach {
-                        val count = database.menuDao().countID(it.id).value
-                        Log.d("countID", "id " + it.id + " is " + count)
-                        if (count == 0 || count == null) {
-                            database.menuDao().saveMenuItem(it.getDBItem())
-                        }
+                        database.menuDao().saveMenuItem(it.getDBItem())
                     }
                 }
             }
         }
         val menuItems by database.menuDao().getAllMenuItems().observeAsState(emptyList())
-        Log.d("getAllMenuItems", menuItems.size.toString())
         Header(false, true, navController)
-        RestDescription()
-        Categories(menuItems)
-        MenuList(menuItems)
+        RestDescription(searchString, onSearchStringChanged)
+        Categories(menuItems, selectedCategories, onCategoryClicked)
+
+        var items = menuItems.sortedBy { it.title }
+            .filter { it.title.contains(searchString, ignoreCase = true) }
+        if (selectedCategories.isNotEmpty()) items =
+            items.filter { selectedCategories.contains(it.category) }
+        MenuList(items)
     }
 }
 
 @Composable
-fun RestDescription() {
+fun RestDescription(searchString: String, onChangeSearchString: (String) -> Unit) {
     Column(
         Modifier
             .fillMaxWidth()
@@ -130,8 +144,8 @@ fun RestDescription() {
         }
         //https://stackoverflow.com/questions/75541072/how-can-i-make-this-custom-text-search-field-in-jetpack-compose
         TextField(
-            value = "",
-            onValueChange = { },
+            value = searchString,
+            onValueChange = onChangeSearchString,
             leadingIcon = { Icon(imageVector = Icons.Default.Search, contentDescription = "") },
             placeholder = { Text(text = "Enter search phrase") },
             modifier = Modifier
@@ -143,7 +157,11 @@ fun RestDescription() {
 }
 
 @Composable
-fun Categories(menuItems: List<MenuItem>) {
+fun Categories(
+    menuItems: List<MenuItem>,
+    selectedCategories: Set<String>,
+    onCategoryClicked: (String) -> Unit
+) {
     Column(Modifier.fillMaxWidth()) {
         Text(
             text = "ORDER FOR DELIVERY!",
@@ -157,30 +175,50 @@ fun Categories(menuItems: List<MenuItem>) {
             if (menuItems.isNotEmpty()) {
                 LazyRow {
                     items(categories) { category ->
-                        category(category)
+                        var selected = selectedCategories.contains(category)
+                        category(category, selected, onCategoryClicked)
                     }
 
                 }
-            } else category(name = "Loading...")
+            } else category(
+                name = "Loading...",
+                selected = false,
+                onCategoryClicked = onCategoryClicked
+            )
         }
     }
-
 }
 
 @Composable
-fun category(name: String) {
+private fun categoryClick(
+    context: Context, name: String, onCategoryClicked: (String) -> Unit
+) = { ->
+//    Toast.makeText(
+//        context, "Not implemented", Toast.LENGTH_SHORT
+//    ).show()
+    onCategoryClicked(name)
+}
+
+@Composable
+fun category(name: String, selected: Boolean, onCategoryClicked: (String) -> Unit) {
+    var colorBG = Color(234, 234, 234)
+    if (selected) colorBG = Color(240, 204, 26)
+
+    var colorText = Color.Gray
+    if (selected) colorText = Color.Black
+
     Button(
-        onClick = { /*TODO*/ },
+        onClick = categoryClick(context = LocalContext.current, name, onCategoryClicked),
         Modifier.padding(8.dp),
         shape = RoundedCornerShape(32),
         colors = ButtonDefaults.outlinedButtonColors(
-            contentColor = Color.Black, containerColor = Color(234, 234, 234)
+            contentColor = Color.Black, containerColor = colorBG
         ),
     ) {
         Text(
             text = name.toUpperCase(),
             fontSize = 14.sp,
-            color = Color.Gray,
+            color = colorText,
             fontWeight = FontWeight.Bold
         )
     }

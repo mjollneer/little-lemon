@@ -26,10 +26,6 @@ interface MenuDao {
     @Query("SELECT * FROM MenuItem")
     fun getAllMenuItems(): LiveData<List<MenuItem>>
 
-    @Query("SELECT count(*) FROM MenuItem WHERE id=:id")
-    fun countID(id: Int): LiveData<Int>
-
-
     @Insert(entity = MenuItem::class, onConflict = OnConflictStrategy.REPLACE)
     fun saveMenuItem(menuItem: MenuItem)
 

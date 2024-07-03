@@ -147,7 +147,10 @@ private fun regicterClick(
 @Composable
 fun Header(showText: Boolean, showAvatar: Boolean, navController: NavController? = null) {
     Box(
-        modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(color = Color.White),
+        contentAlignment = Alignment.CenterEnd
     ) {
         Column(Modifier.fillMaxWidth()) {
             Image(
